@@ -1,0 +1,61 @@
+set.seed(555)
+
+# Taking 70% for the training data and 30% for the test data
+inTrain <- createDataPartition(y = pmltrain$classe, list = FALSE, p=0.7)
+trainData <- pmltrain[inTrain,]
+testData <- pmltrain[-inTrain,]
+
+
+
+
+
+
+table(is.na(trainData))
+naprops <- colSums(is.na(trainData))/nrow(trainData)
+mostlyNAs <- names(naprops[naprops > 0.75]) # mostly being 75%
+mostlyNACols <- which(naprops > 0.75) # there's about 100 of them
+
+
+
+set.seed(1256)
+smalltrain <- trainData %>% tbl_df %>% sample_n(size=1000)
+smalltrain <- smalltrain[,-mostlyNACols]
+smalltrain <- smalltrain[,-grep("X|user_name",names(smalltrain))]
+smalltrain <- smalltrain[,-grep("cvtd_timestamp",names(smalltrain))]
+modelVars <- names(smalltrain)
+modelVars1 <- modelVars[-grep("classe",modelVars)] # remove the classe varset.seed(57)
+cleanedTrainData <- trainData[,modelVars]
+modelFit <- randomForest(classe ~., data=cleanedTrainData, type="class")
+
+
+
+## Get the values predicted by the model
+predTrain <- predict(modelFit,newdata=trainData)
+
+## Use a confusion matrix to get the insample error
+confusionMatrix(predTrain,trainData$classe)$table
+
+map <- mimapa %>%
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(popup=paste
+             ("<br>Country: ", 
+               htmlEscape(mimapa$Country), 
+              "<br>City: ", 
+               htmlEscape(mimapa$City), 
+              "<br>Restaurant: ", 
+               htmlEscape(mimapa$Name),
+              "<br>Ranking: ",
+               formatC(datamap$Ranking, format = "d", big.mark = ",")
+              ) 
+            )
+            
+            
+            
+            
+            pmltest <- read.csv("./Data/pml-testing.csv",na.strings=c("NA","","#DIV/0!"))
+
+
+
+
+
